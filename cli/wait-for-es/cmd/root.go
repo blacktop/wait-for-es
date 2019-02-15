@@ -21,23 +21,49 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"time"
 
+	w4e "github.com/blacktop/wait-for-es"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	address string
+	timeout int64
+	verbose bool
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "wait-for-es",
-	Short: "A brief description of your application",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {},
+	Short: "Wait until Elasticsearch become available",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		if verbose {
+			log.SetLevel(log.DebugLevel)
+		}
+
+		connCtx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+		defer cancel()
+
+		wfe := w4e.WaitForEs{
+			URL:     address,
+			Timeout: timeout,
+		}
+		err := wfe.WaitForConnection(connCtx, timeout)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "failed to connect to elasticsearch"))
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -56,10 +82,11 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.wait-for-es.yaml)")
-
+	rootCmd.PersistentFlags().StringVar(&address, "address", "http://localhost:9200", "elasticsearch address")
+	rootCmd.PersistentFlags().Int64Var(&timeout, "timeout", 60, "timeout (default is 60)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "verbose output")
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -21,20 +21,30 @@
 package waitfores
 
 import (
-		"github.com/olivere/elastic"
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
-func testConnection() error {
+// WaitForEs contains the wait-for-es settings
+type WaitForEs struct {
+	URL      string
+	Username string
+	Password string
+	Health   string
+	Timeout  int64
+}
 
-	// Create URL from host/port
-	db.getURL()
+func (wfe *WaitForEs) testConnection() error {
 
-	// connect to ElasticSearch where --link elasticsearch was using via malice in Docker
 	client, err := elastic.NewSimpleClient(
-		elastic.SetURL(db.URL),
+		elastic.SetURL(wfe.URL),
 		elastic.SetBasicAuth(
-			utils.Getopts(db.Username, "MALICE_ELASTICSEARCH_USERNAME", ""),
-			utils.Getopts(db.Password, "MALICE_ELASTICSEARCH_PASSWORD", ""),
+			wfe.Username,
+			wfe.Password,
 		),
 	)
 	if err != nil {
@@ -42,8 +52,8 @@ func testConnection() error {
 	}
 
 	// Ping the Elasticsearch server to get e.g. the version number
-	log.Debugf("attempting to PING to: %s", db.URL)
-	info, code, err := client.Ping(db.URL).Do(context.Background())
+	log.Debugf("attempting to PING to: %s", wfe.URL)
+	info, code, err := client.Ping(wfe.URL).Do(context.Background())
 	if err != nil {
 		return errors.Wrap(err, "failed to ping elasticsearch")
 	}
@@ -52,14 +62,14 @@ func testConnection() error {
 		"code":    code,
 		"cluster": info.ClusterName,
 		"version": info.Version.Number,
-		"url":     db.URL,
+		"url":     wfe.URL,
 	}).Debug("elasticSearch connection successful")
 
 	return nil
 }
 
 // WaitForConnection waits for connection to Elasticsearch to be ready
-func (db *Database) WaitForConnection(ctx context.Context, timeout int) error {
+func (wfe *WaitForEs) WaitForConnection(ctx context.Context, timeout int64) error {
 
 	var err error
 
@@ -68,16 +78,16 @@ func (db *Database) WaitForConnection(ctx context.Context, timeout int) error {
 	connCtx, cancel := context.WithTimeout(ctx, time.Duration(timeout)*time.Second)
 	defer cancel()
 
-	log.Debug("===> trying to connect to elasticsearch")
+	log.Info("===> trying to connect to elasticsearch")
 	for {
 		// Try to connect to Elasticsearch
 		select {
 		case <-connCtx.Done():
 			return errors.Wrapf(err, "connecting to elasticsearch timed out after %d seconds", secondsWaited)
 		default:
-			err = testConnection()
+			err = wfe.testConnection()
 			if err == nil {
-				log.Debugf("elasticsearch came online after %d seconds", secondsWaited)
+				log.Infof("elasticsearch came online after %d seconds", secondsWaited)
 				return nil
 			}
 			// not ready yet

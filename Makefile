@@ -60,6 +60,10 @@ lint: ## Run all the linters
 dry_release:
 	goreleaser --skip-publish --rm-dist --skip-validate
 
+.PHONY: snapshot
+snapshot: ## Create a snapshot
+	goreleaser --snapshot --rm-dist
+
 .PHONY: bump
 bump: ## Incriment version patch number
 	@echo " > Bumping VERSION"

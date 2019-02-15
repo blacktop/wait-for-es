@@ -20,23 +20,17 @@ go get github.com/blacktop/wait-for-es
 
 ```golang
 import (
-    "io/ioutil"
     "log"
 
-    "github.com/blacktop/wait-for-es"
+    w4e "github.com/blacktop/wait-for-es"
     "github.com/pkg/errors"
 )
 
 func main() {
-    dat, err := ioutil.ReadFile("compressed.bin")
-    if err != nil {
-        log.Fatal(errors.Wrap(err, "failed to read compressed file"))
-    }
 
-    decompressed := wait-for-es.Decompress(dat)
-    err = ioutil.WriteFile("compressed.bin.decompressed", decompressed, 0644)
+    err := w4e.WaitForConnection(dat)
     if err != nil {
-        log.Fatal(errors.Wrap(err, "failed to decompress file"))
+        log.Fatal(errors.Wrap(err, "failed to connect to elasticsearch"))
     }
 }
 ```

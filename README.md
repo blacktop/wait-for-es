@@ -1,6 +1,6 @@
 # wait-for-es
 
-[![GoDoc](https://godoc.org/github.com/blacktop/wait-for-es?status.svg)](https://godoc.org/github.com/blacktop/wait-for-es) [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+[![GoDoc](https://godoc.org/github.com/blacktop/wait-for-es?status.svg)](https://godoc.org/github.com/blacktop/wait-for-es) [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org) [![Github All Releases](https://img.shields.io/github/downloads/blacktop/wait-for-es/total.svg)](https://github.com/blacktop/wait-for-es/releases/latest) [![GitHub release](https://img.shields.io/github/release/blacktop/wait-for-es.svg)](https://github.com/blacktop/wait-for-es/releases)
 
 > Wait until Elasticsearch become available.
 

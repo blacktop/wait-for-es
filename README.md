@@ -20,15 +20,23 @@ go get github.com/blacktop/wait-for-es
 
 ```golang
 import (
+    "context"
     "log"
+    "time"
 
     w4e "github.com/blacktop/wait-for-es"
     "github.com/pkg/errors"
 )
 
 func main() {
+    connCtx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+    defer cancel()
 
-    err := w4e.WaitForConnection(dat)
+    w := w4e.WaitForEs{
+        URL:     address,
+        Timeout: timeout,
+    }
+    err := w.WaitForConnection(connCtx, timeout)
     if err != nil {
         log.Fatal(errors.Wrap(err, "failed to connect to elasticsearch"))
     }
@@ -46,9 +54,10 @@ Download **wait-for-es** from [releases](https://github.com/blacktop/wait-for-es
 Wait-for-it to be ready
 
 ```bash
-$ wait-for-es --addr localhost:9200 --timeout 60
+$ wait-for-es --address http://localhost:9200 --timeout 60
 
-...
+INFO[0000] ===> trying to connect to elasticsearch
+INFO[0015] elasticsearch came online after 15 seconds
 ```
 
 ## License

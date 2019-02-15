@@ -45,7 +45,7 @@ func main() {
 
 ### Install
 
-Download **punzip** from [releases](https://github.com/blacktop/partialzip/releases)
+Download **wait-for-es** from [releases](https://github.com/blacktop/wait-for-es/releases)
 
 ### Usage
 

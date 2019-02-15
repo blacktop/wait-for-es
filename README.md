@@ -49,6 +49,14 @@ func main() {
 
 Download **wait-for-es** from [releases](https://github.com/blacktop/wait-for-es/releases)
 
+#### macOS
+
+Via [homebrew](https://brew.sh)
+
+```bash
+$ brew install blacktop/tap/wait-for-es
+```
+
 ### Usage
 
 Wait-for-it to be ready

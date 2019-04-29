@@ -59,13 +59,35 @@ $ brew install blacktop/tap/wait-for-es
 
 ### Usage
 
-Wait-for-it to be ready
+```bash
+$ wait-for-es --help
+
+Wait until Elasticsearch become available
+
+Usage:
+  wait-for-es [flags]
+
+Flags:
+      --address string   elasticsearch address (default "http://localhost:9200")
+      --config string    config file (default is $HOME/.wait-for-es.yaml)
+  -H, --healthy          wait until cluster health is green
+  -h, --help             help for wait-for-es
+      --timeout int      timeout (default is 60) (default 60)
+  -V, --verbose          verbose output
+```
 
 ```bash
-$ wait-for-es --address http://localhost:9200 --timeout 60
+$ wait-for-es --address http://localhost:9200 --timeout 60 --healthy --verbose
 
 INFO[0000] ===> trying to connect to elasticsearch
-INFO[0015] elasticsearch came online after 15 seconds
+DEBU[0000] attempting to PING to: http://localhost:9200
+DEBU[0000]  * could not connect to elasticsearch (sleeping for 1 second)
+DEBU[0001] attempting to PING to: http://localhost:9200
+DEBU[0001]  * could not connect to elasticsearch (sleeping for 1 second)
+..SNIP...
+DEBU[0021] cluster status is "green"
+DEBU[0021] elasticSearch connection successful           cluster=elasticsearch code=200 url="http://localhost:9200" version=7.0.0
+INFO[0021] elasticsearch came online after 21 seconds
 ```
 
 ## License

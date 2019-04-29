@@ -39,6 +39,7 @@ var (
 	address string
 	timeout int64
 	verbose bool
+	healthy bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -59,7 +60,7 @@ var rootCmd = &cobra.Command{
 			URL:     address,
 			Timeout: timeout,
 		}
-		err := wfe.WaitForConnection(connCtx, timeout)
+		err := wfe.WaitForConnection(connCtx, timeout, healthy)
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "failed to connect to elasticsearch"))
 		}
@@ -86,6 +87,7 @@ func init() {
 	rootCmd.PersistentFlags().Int64Var(&timeout, "timeout", 60, "timeout (default is 60)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+	rootCmd.Flags().BoolVarP(&healthy, "healthy", "H", false, "wait until cluster health is green")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "verbose output")
 }
 

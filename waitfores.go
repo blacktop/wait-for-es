@@ -23,8 +23,8 @@ package waitfores
 import (
 	"context"
 	"time"
-
-	"github.com/olivere/elastic"
+	"fmt"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -38,7 +38,7 @@ type WaitForEs struct {
 	Timeout  int64
 }
 
-func (wfe *WaitForEs) testConnection() error {
+func (wfe *WaitForEs) testConnection(healthy bool) error {
 
 	client, err := elastic.NewSimpleClient(
 		elastic.SetURL(wfe.URL),
@@ -58,6 +58,18 @@ func (wfe *WaitForEs) testConnection() error {
 		return errors.Wrap(err, "failed to ping elasticsearch")
 	}
 
+	if healthy {
+		res, err := client.ClusterHealth().WaitForStatus("green").Timeout("15s").Do(context.Background())
+		if err != nil {
+			return errors.Wrap(err, "failed to get cluster health")
+		}
+		if res.TimedOut {
+			return fmt.Errorf("time out waiting for cluster status %q\n", "green")
+		} else {
+			log.Debugf("cluster status is %q\n", res.Status)
+		}
+	}
+
 	log.WithFields(log.Fields{
 		"code":    code,
 		"cluster": info.ClusterName,
@@ -69,7 +81,7 @@ func (wfe *WaitForEs) testConnection() error {
 }
 
 // WaitForConnection waits for connection to Elasticsearch to be ready
-func (wfe *WaitForEs) WaitForConnection(ctx context.Context, timeout int64) error {
+func (wfe *WaitForEs) WaitForConnection(ctx context.Context, timeout int64, healthy bool) error {
 
 	var err error
 
@@ -85,7 +97,7 @@ func (wfe *WaitForEs) WaitForConnection(ctx context.Context, timeout int64) erro
 		case <-connCtx.Done():
 			return errors.Wrapf(err, "connecting to elasticsearch timed out after %d seconds", secondsWaited)
 		default:
-			err = wfe.testConnection()
+			err = wfe.testConnection(healthy)
 			if err == nil {
 				log.Infof("elasticsearch came online after %d seconds", secondsWaited)
 				return nil

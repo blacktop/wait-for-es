@@ -74,7 +74,7 @@ bump: ## Incriment version patch number
 .PHONY: release
 release: bump ## Create a new release from the VERSION
 	@echo " > Creating Release"
-	@hack/make/release $(shell cat VERSION)
+	@hack/make/release v$(shell cat VERSION)
 	@goreleaser --rm-dist
 
 .PHONY: destroy

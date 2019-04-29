@@ -84,7 +84,7 @@ func init() {
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.wait-for-es.yaml)")
 	rootCmd.PersistentFlags().StringVar(&address, "address", "http://localhost:9200", "elasticsearch address")
-	rootCmd.PersistentFlags().Int64Var(&timeout, "timeout", 60, "timeout (default is 60)")
+	rootCmd.PersistentFlags().Int64Var(&timeout, "timeout", 60, "timeout in seconds")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolVarP(&healthy, "healthy", "H", false, "wait until cluster health is green")

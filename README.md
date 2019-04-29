@@ -72,7 +72,7 @@ Flags:
       --config string    config file (default is $HOME/.wait-for-es.yaml)
   -H, --healthy          wait until cluster health is green
   -h, --help             help for wait-for-es
-      --timeout int      timeout (default is 60) (default 60)
+      --timeout int      timeout in seconds (default 60)
   -V, --verbose          verbose output
 ```
 
